@@ -25,6 +25,7 @@ void handleSmartConfigClient(void);
 void initSnifferConfig(HubConfig* smartConfig);
 void prepareSmartConfig(HubConfig* smartConfig);
 //just for testing
+void clearStoredConfig(void);
 void printConfig(HubConfig* smartConfig);
 bool needRestart();
 

@@ -9,23 +9,15 @@
 
 //private data
 String configPage;
-String jsonConfig;
-String macAddressJson;
 ESP8266WebServer server(httpPort);
 int snifferState;
 HubConfig * _oldConfig;
-bool wifiConnected = false;
 
 //private functions
 void handleRoot();
 void handlePwd();
-void handleConfig();
-void wifiConfigVerify();
 void wifiConfigResult();
 void launchWeb(void);
-void clearStoredConfig(void);
-void clearStoredWifi(void);
-
 ///////////////////
 
 void setupAP(HubConfig* oldConfig) {
@@ -34,9 +26,6 @@ void setupAP(HubConfig* oldConfig) {
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
   delay(100);
-  
-  jsonConfig="{\"data\":[";
-  
   configPage = "";
   configPage.concat("<html lang=\"en-us\"><head><title>Sniffer configuration</title>");
   configPage.concat("<style>h1 {color: CornflowerBlue ;} h2 {color: red;} .city {float: left;margin: 5px;padding: 15px;} ");
@@ -70,21 +59,9 @@ void setupAP(HubConfig* oldConfig) {
       configPage.concat("<input type=\"hidden\" name=\"ssid\" value=\""+ WiFi.SSID(i)+ "\">");
       configPage.concat("<button type=\"submit\" name=\"submit_param\" value=\"submit_value\" class=\"link-button\">");
       configPage.concat(WiFi.SSID(i)+"</button></form></li>");
-      
-      if (i==n-1)
-		jsonConfig.concat("\"" + WiFi.SSID(i) + "\"");
-	  else
-		jsonConfig.concat("\"" + WiFi.SSID(i) + "\",");
      }
      configPage.concat("</ol></div></body></html>");
   }
-  
-  jsonConfig.concat("],");
-  
-  jsonConfig.concat("\"mac_address\":");
-  jsonConfig.concat("\"" + WiFi.macAddress() + "\"");
-  jsonConfig.concat("}");
-    
   delay(100);
   WiFi.softAP(smartConfigSSID);
   Serial.println("softap");
@@ -102,34 +79,24 @@ void launchWeb(void) {
     // Start the server
     server.on("/", handleRoot);
     server.on("/inputPwd",handlePwd);
-    server.on("/wifi_config/verify",wifiConfigVerify);
     server.on("/wifi_config/result",wifiConfigResult);
-    server.on("/config",handleConfig);
-        
+    
     server.begin();
     Serial.println("Server started");   
 
 }
-
-void wifiConfigVerify(){
+void wifiConfigResult(){
 	HubConfig smartConfig;
-
-	String verifyPage = "";
-  	verifyPage.concat("<html lang=\"en-us\"><head><title>Sniffer configuration</title>");
-  	verifyPage.concat("<meta http-equiv=\"refresh\" content=\"15;url=/wifi_config/result\">");
-  	verifyPage.concat("</head><body><h1>Sniffer is verifying Wifi Configuration. Please be patient! Result is coming ...</h1>");
-  	verifyPage.concat("</body></html>");
-  	
-  	
-  	String ssid, pwd, code, latitude, longitude, macStr;
-    Serial.println("Config Args: ");
+    String htmlStr="<h1>Configuration stored. Hub restarting!</h1>";
+    String ssid, pwd, code, latitude, longitude, macStr;
+    Serial.println("Args: ");
     for(int i = 0; i < server.args(); i++){
       Serial.print(server.argName(i));
       Serial.print(": ");
       Serial.println(server.arg(i));
     }
     Serial.println();
-    Serial.println("Config Headers: ");
+    Serial.println("Headers: ");
     for(int i = 0; i < server.headers(); i++){
       Serial.print(server.headerName(i));
       Serial.print(": ");
@@ -142,66 +109,21 @@ void wifiConfigVerify(){
     latitude = server.arg("lat");
 	longitude = server.arg("long");
     macStr = server.arg("mac");
-    
-    strcpy(smartConfig.ssid,ssid.c_str());
-	strcpy(smartConfig.pwd,pwd.c_str());
-	//send response to client
-	server.send(200, "text/html", verifyPage);
 	
-	WiFi.begin(smartConfig.ssid,smartConfig.pwd);
-	int c = 0;
-	Serial.print("Wifi connecting");
-	while ( c < 30 ) {
-    	if (WiFi.status() == WL_CONNECTED) { 
-    		wifiConnected = true;
-      		break; 
-    	} 
-    	Serial.print(".");
-    	delay(500);
-    	c++;
-  	}
-  	if (wifiConnected) {
-  		Serial.println("Wifi connected");
-  		
-		strcpy(smartConfig.code,code.c_str());
-	    strcpy(smartConfig.latitude,latitude.c_str());
-		strcpy(smartConfig.longitude,longitude.c_str());
-	    strcpy(smartConfig.macStr,macStr.c_str());
-
-	    smartConfig.mode = NORM_MODE;
-	    storeConfig(&smartConfig);
-  	}
-}
-
-void wifiConfigResult(){
-	String htmlErr = "";
-  	htmlErr.concat("<html lang=\"en-us\"><head><title>Sniffer configuration</title>");
-  	htmlErr.concat("</head><body>");
-  	htmlErr.concat("<h1>Configuration result:</h1>");
-    htmlErr.concat("<h2>Wrong configuration! Please go back try again!</h2>");
-    htmlErr.concat("<input type=\"button\" onclick=\"location.href='/';\" value=\"Try again\" />");
-  	htmlErr.concat("</body></html>");
-
-	String htmlStr = "";
-  	htmlStr.concat("<html lang=\"en-us\"><head><title>Sniffer configuration</title>");
-  	htmlStr.concat("</head><body>");
-  	htmlStr.concat("<h1>Configuration result:</h1>");
-    htmlStr.concat("<h2>Wifi connected. Configuration stored. Restarting!</h2>");
-  	htmlStr.concat("</body></html>");
-
-	if (wifiConnected) {
-		Serial.println("Wifi connected");
-	    server.send(200, "text/html", htmlStr);
-	    delay(500);
-		snifferState = ONBOARDED;
-		WiFi.mode(WIFI_STA);
+    strcpy(smartConfig.ssid,ssid.c_str());
+    strcpy(smartConfig.pwd,pwd.c_str());
+	strcpy(smartConfig.code,code.c_str());
+    strcpy(smartConfig.latitude,latitude.c_str());
+	strcpy(smartConfig.longitude,longitude.c_str());
+    strcpy(smartConfig.macStr,macStr.c_str());
+    
+    server.send(200, "text/html", htmlStr);
+    smartConfig.mode = NORM_MODE;
+    storeConfig(&smartConfig);
+	
+	snifferState = ONBOARDED;
 		
-	} else {
-  		Serial.println("Wifi NOT connected");
-		server.send(200, "text/html", htmlErr);
-	}
 }
-
 void handlePwd(){
  
   Serial.println("Args: ");
@@ -216,23 +138,15 @@ void handlePwd(){
   
   String htmlPage ="<html><body><h2>Enter Sniffer Config</h2>";
 
-	htmlPage.concat("<form method=\"POST\" action=\"/wifi_config/verify\">");
+	htmlPage.concat("<form method=\"POST\" action=\"/wifi_config/result\">");
 	htmlPage.concat("<table><tr><td>Wifi</td><td colspan=2><input readonly name=\"ssid\" id=\"ssid\" value=\"" + decodedStr +"\"\\></td></tr>");
 	htmlPage.concat("<tr><td>Password</td><td colspan=2><input type=\"text\" name=\"pwd\" id=\"pwd\" \"\\></td></tr>");
 	htmlPage.concat("<tr><td colspan=3><hr></td></tr>");
-	decodedStr="";
-	decodedStr.concat (_oldConfig->code);
-	htmlPage.concat("<tr><td>Code</td><td colspan=2><input type=\"text\" name=\"code\" id=\"code\" value=\"" + decodedStr +"\"\\></td></tr>");
+	htmlPage.concat("<tr><td>Code</td><td colspan=2><input type=\"text\" name=\"code\" id=\"code\" value=\"" + _oldConfig->code +"\"\\></td></tr>");
 	htmlPage.concat("<tr><td rowspan=2><b>GPS</b></td>");
-	decodedStr="";
-	decodedStr.concat (_oldConfig->latitude);
-	htmlPage.concat("<td>Latitude</td><td><input type=\"text\" name=\"lat\" id=\"lat\" value=\"" + decodedStr +"\"\\></td></tr>");
-	decodedStr="";
-	decodedStr.concat (_oldConfig->longitude);
-	htmlPage.concat("<tr><td>Longitude</td><td><input type=\"text\" name=\"long\" id=\"long\" value=\"" + decodedStr +"\"\\></td></tr>");
-	decodedStr="";
-	decodedStr.concat (_oldConfig->macStr);
-	htmlPage.concat("<tr><td>MAC</td><td colspan=2><input type=\"text\" name=\"mac\" id=\"mac\" value=\"" + decodedStr +"\"\\></td></tr>");
+	htmlPage.concat("<td>Latitude</td><td><input type=\"text\" name=\"lat\" id=\"lat\"\\></td></tr>");
+	htmlPage.concat("<tr><td>Longitude</td><td><input type=\"text\" name=\"long\" id=\"long\"\\></td></tr>");
+	htmlPage.concat("<tr><td>MAC</td><td colspan=2><input type=\"text\" name=\"mac\" id=\"mac\"\\></td></tr>");
 	htmlPage.concat("<tr><td></td><td><input type=\"submit\" value=\"Connect\"\\></td></tr>");
 	htmlPage.concat("</table></form></body></html>");
   
@@ -248,9 +162,6 @@ void handleRoot() {
   //Serial.println(configPage);
   server.send(200, "text/html",configPage);
 }
-void handleConfig(){
-    server.send(200, "text/plain", jsonConfig);
-}
 
 void loadConfig(HubConfig* smartConfig){
   //read eeprom for ssid and pass
@@ -258,11 +169,9 @@ void loadConfig(HubConfig* smartConfig){
   smartConfig->mode = (uint8_t)(EEPROM.read(0));
   Serial.print("Mode: ");
   Serial.println(smartConfig->mode);
-  Serial.print("Reading: ");
-  Serial.println(EEPROM.read(0));
   int usedByteCount = sizeof(smartConfig->mode);
 
-  String esid="",epass = "",ecode ="",elatitude="", elongitude="", emac="";
+  String esid="",epass = "",ecode ="",elatitude="", elongitude="", emac="";;
   for (int i = usedByteCount; i < usedByteCount + sizeof(smartConfig->ssid); ++i)
     {
       if(EEPROM.read(i) != 0){
@@ -270,92 +179,60 @@ void loadConfig(HubConfig* smartConfig){
       }
     }
   esid.trim();
-  Serial.print("eSSID: ");
+  Serial.print("SSID: ");
   Serial.print(esid);Serial.println("\\END");  
   Serial.print("esid length: ");
-  Serial.println(esid.length());
+  Serial.print(esid.length());
   Serial.println("Reading EEPROM pass");
   //read Password
   usedByteCount += sizeof(smartConfig->ssid);
   for (int i = usedByteCount; i <usedByteCount + sizeof(smartConfig->pwd); ++i)
-  {
-	  if(EEPROM.read(i) != 0){
-        epass += char(EEPROM.read(i));
-      }
-//       epass += char(EEPROM.read(i));
-  }
-  Serial.print("ePASS: ");
+    {
+      epass += char(EEPROM.read(i));
+    }
+  Serial.print("PASS: ");
   Serial.print(epass);  
   Serial.println("\\END");  
-  Serial.print("epass length: ");
-  Serial.println(epass.length());
-  epass.trim();
+  esid.trim();
   //read Sniffer Code
   usedByteCount += sizeof(smartConfig->pwd);
   for (int i = usedByteCount; i <usedByteCount + sizeof(smartConfig->code); ++i)
     {
-//	  if(EEPROM.read(i) != 0){
-//        ecode += char(EEPROM.read(i));
- //     }
-    
- 		if(isAscii(char(EEPROM.read(i))))
- 			ecode += char(EEPROM.read(i));
+      ecode += char(EEPROM.read(i));
     }
-  Serial.print("eCODE: ");
+  Serial.print("CODE: ");
   Serial.print(ecode);  
   Serial.println("\\END");  
-  Serial.print("ecode length: ");
-  Serial.println(ecode.length());
   ecode.trim();
   //read Sniffer Latitude
   usedByteCount += sizeof(smartConfig->code);
   for (int i = usedByteCount; i <usedByteCount + sizeof(smartConfig->latitude); ++i)
     {
-	 // if(EEPROM.read(i) != 0){
-    //    elatitude += char(EEPROM.read(i));
-    //  }
- 		if(isAscii(char(EEPROM.read(i))))
- 			elatitude += char(EEPROM.read(i));
+      elatitude += char(EEPROM.read(i));
     }
-  Serial.print("eLAT: ");
+  Serial.print("LAT: ");
   Serial.print(elatitude);  
-  Serial.println("\\END"); 
-  Serial.print("elatitude length: ");
-  Serial.println(elatitude.length());  
+  Serial.println("\\END");  
   elatitude.trim();
   //read Sniffer Longitude
   usedByteCount += sizeof(smartConfig->latitude);
   for (int i = usedByteCount; i <usedByteCount + sizeof(smartConfig->longitude); ++i)
     {
-	 // if(EEPROM.read(i) != 0){
-      //  elongitude += char(EEPROM.read(i));
-    //  }
-    
- 		if(isAscii(char(EEPROM.read(i))))
- 			elongitude += char(EEPROM.read(i));
+      elongitude += char(EEPROM.read(i));
     }
-  Serial.print("eLONG: ");
+  Serial.print("LONG: ");
   Serial.print(elongitude);  
   Serial.println("\\END");  
-  Serial.print("elongitude length: ");
-  Serial.println(elongitude.length()); 
   elongitude.trim();
   //read Sniffer MAC
   usedByteCount += sizeof(smartConfig->longitude);
   for (int i = usedByteCount; i <usedByteCount + sizeof(smartConfig->macStr); ++i)
     {
-	 // if(EEPROM.read(i) != 0){
-     //   emac += char(EEPROM.read(i));
-     // }
-    
- 		if(isAscii(char(EEPROM.read(i))))
- 			emac += char(EEPROM.read(i));
+      emac += char(EEPROM.read(i));
     }
-  Serial.print("eMAC: ");
+  Serial.print("LAT: ");
   Serial.print(emac);  
-  Serial.println("\\END"); 
-  Serial.print("emac length: ");
-  Serial.println(emac.length());   
+  Serial.println("\\END");  
   emac.trim();
   
   strcpy(smartConfig->ssid,esid.c_str());
@@ -374,13 +251,8 @@ void storeConfig(HubConfig* smartConfig){
   String qsid = "",qpass="", qcode ="",qlatitude="", qlongitude="", qmac="";
   
   
-   for (int i = 0; i < sizeof(smartConfig); ++i) { 
-  	EEPROM.write(i, '\0'); 
-  	Serial.print(".");
-  }
+  for (int i = 0; i < sizeof(smartConfig); ++i) { EEPROM.write(i, 0); }
   
-  EEPROM.commit();
-  //delay(100);
   EEPROM.write(0, smartConfig->mode);
   int usedByteCount = sizeof(smartConfig->mode);
   qsid.concat(smartConfig->ssid);
@@ -403,87 +275,64 @@ void storeConfig(HubConfig* smartConfig){
   Serial.print(qmac);
   Serial.println("");
   
-  Serial.print("writing eeprom ssid from byte :");
-  Serial.println(usedByteCount);
+  Serial.println("writing eeprom ssid:");
   for (int i = 0; i < qsid.length(); ++i)
     {
       EEPROM.write(usedByteCount+i, qsid[i]);
-//       Serial.print("Wrote: ");
-//       Serial.println(qsid[i]); 
+      Serial.print("Wrote: ");
+      Serial.println(qsid[i]); 
     }
 
   usedByteCount += sizeof(smartConfig->ssid);
-  Serial.print("writing eeprom pass from byte :");
-  Serial.println(usedByteCount);
+  Serial.println("writing eeprom pass:"); 
   for (int i = 0; i < qpass.length(); ++i)
     {
       EEPROM.write(usedByteCount+i, qpass[i]);
-//       Serial.print("Wrote: ");
-//       Serial.println(qpass[i]); 
+      Serial.print("Wrote: ");
+      Serial.println(qpass[i]); 
     }    
   usedByteCount += sizeof(smartConfig->pwd);
-  Serial.print("writing eeprom code from byte :");
-  Serial.println(usedByteCount);
+  Serial.println("writing eeprom code:"); 
   for (int i = 0; i < qcode.length(); ++i)
     {
       EEPROM.write(usedByteCount+i, qcode[i]);
-//       Serial.print("Wrote: ");
-//       Serial.println(qcode[i]); 
+      Serial.print("Wrote: ");
+      Serial.println(qcode[i]); 
     }
-  
   usedByteCount += sizeof(smartConfig->code);
-  Serial.print("writing eeprom lat from byte :");
-  Serial.println(usedByteCount);
-  int j;
-  for (j = 0; j < qlatitude.length(); ++j)
+  Serial.println("writing eeprom lat:"); 
+  for (int i = 0; i < qlatitude.length(); ++i)
     {
-      EEPROM.write(usedByteCount+j, qlatitude[j]);
-//       Serial.print("Wrote: ");
-//       Serial.println(qlatitude[j]); 
+      EEPROM.write(usedByteCount+i, qlatitude[i]);
+      Serial.print("Wrote: ");
+      Serial.println(qlatitude[i]); 
     }
-	EEPROM.write(usedByteCount+j, '\0');
-	
   usedByteCount += sizeof(smartConfig->latitude);
-  Serial.print("writing eeprom long from byte :");
-  Serial.println(usedByteCount);
-  
+  Serial.println("writing eeprom long:"); 
   for (int i = 0; i < qlongitude.length(); ++i)
     {
       EEPROM.write(usedByteCount+i, qlongitude[i]);
-//       Serial.print("Wrote: ");
-//       Serial.println(qlongitude[i]); 
+      Serial.print("Wrote: ");
+      Serial.println(qlongitude[i]); 
     }
   usedByteCount += sizeof(smartConfig->longitude);
-  Serial.print("writing eeprom mac from byte :");
-  Serial.println(usedByteCount);
+  Serial.println("writing eeprom mac:"); 
   for (int i = 0; i < qmac.length(); ++i)
     {
       EEPROM.write(usedByteCount+i, qmac[i]);
-//       Serial.print("Wrote: ");
-//       Serial.println(qmac[i]); 
+      Serial.print("Wrote: ");
+      Serial.println(qmac[i]); 
     }
   EEPROM.commit();
-}
-void clearStoredWifi(){
-	HubConfig * dummy;
-  Serial.println("\nclearing wifi config only");
-        for (int i = 0; i < sizeof(dummy->mode)+sizeof(dummy->ssid)+sizeof(dummy->pwd); ++i) { 
-        	Serial.print(".");
-			EEPROM.write(i, 0); 
-		}
-	Serial.println("");
-  EEPROM.commit();
-  //delay(100);
 }
 void clearStoredConfig(){
 	HubConfig * dummy;
   Serial.println("\nclearing wifi config only");
-        for (int i = 0; i < sizeof(HubConfig); ++i) { 
+        for (int i = 0; i < sizeof(dummy->mode)+sizeof(dummy->ssid)+sizeof(dummy->pwd); ++i) { 
 			EEPROM.write(i, 0); 
 		}
 
   EEPROM.commit();
-  //delay(100);
 }
 bool isConfigMode(HubConfig* smartConfig){
 	return smartConfig->mode == CONFIG_MODE;
@@ -492,7 +341,7 @@ void handleSmartConfigClient(){
 	server.handleClient();
 }
 void initSnifferConfig(HubConfig* smartConfig){
-  Serial.println("initSnifferConfig ");
+	
   EEPROM.begin(1024);
   delay(10);
   loadConfig(smartConfig);
@@ -501,7 +350,6 @@ void initSnifferConfig(HubConfig* smartConfig){
   
 }
 void prepareSmartConfig(HubConfig* smartConfig){
-	Serial.println("prepareSmartConfig ");
 	smartConfig->mode = CONFIG_MODE;
 	smartConfig->ssid[0] = '\0';
 	smartConfig->pwd[0] = '\0';
@@ -509,17 +357,12 @@ void prepareSmartConfig(HubConfig* smartConfig){
 	//smartConfig->latitude[0] = '\0';
 	//smartConfig->longitude[0] = '\0';
 	//smartConfig->macStr[0] = '\0';
-	//clearStoredConfig();
+	clearStoredConfig();
     //hubConfig.mode = NORM_MODE;
-	WiFi.mode(WIFI_OFF);
-	//delay(50);
-	clearStoredWifi();
-	printConfig(smartConfig);
-    storeConfig(smartConfig);
+    //storeConfig(smartConfig);
     
 }
 void printConfig(HubConfig* smartConfig){
-	Serial.print("MODE: "); Serial.println(smartConfig->mode);
 	Serial.print("SSID: "); Serial.println(smartConfig->ssid);
 	Serial.print("PWD: "); Serial.println(smartConfig->pwd);
 	Serial.print("CODE: "); Serial.println(smartConfig->code);

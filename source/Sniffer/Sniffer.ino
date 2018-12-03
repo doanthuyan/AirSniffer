@@ -1,167 +1,53 @@
-#include <SPI.h>
-#include <dht.h>
-#include <Sniffer_Smart_Config.h>
-#include <Sniffer_Wifi_Util.h>
-#include <Sniffer_Dust_Sensor.h>
-#include <Sniffer_Data_Util.h>
-#include <Sniffer_Rest_Util.h>
-//for portable IDE
-/*#include <ESP8266WiFi.h>
 #include <SoftwareSerial.h>
-#include <EEPROM.h>
-#include <ESP8266WebServer.h>
-#include <ArduinoJson.h>*/
-
 #include "properties.h"
+#include <SPI.h>
+#include "util.h"
+#include <dht.h>
+#include <JeeLib.h> // Low power functions library
+#include "Sniffer_Dust_Sensor.h"
+ISR(WDT_vect) { Sleepy::watchdogEvent(); } // Setup the watchdog
 
-SnifferDustSensor dustSensor;
-Environment envData;
-
-HubConfig hubConfig;
 dht DHT;
+#define DHT11_PIN 5
 
-char data[50]= {0};
 
-int i=0;
-int btnVoltage, refVoltage;
+SoftwareSerial cc1101Serial(9, 10); // RX, TX
+Environment envData;
+SnifferDustSensor dustSensor;
 
-void highInterrupt();
-void showStatus(bool ok);
-bool led_status = false;
-unsigned long lastCall;
-unsigned long lastReadCall;
-bool restarted = true;
-int blink_type = 1; //0: no blink; 1: blink; 2: flash twice; 3: flash three
+void setup()
+{
+    bool clear = true;
+    Serial.begin(9600 );
 
-void setup(){
-  //ESP.eraseConfig();
-  Serial.begin(115200);
-  //Serial.setDebugOutput(true);
-  Serial.println();
-  Serial.println();
-  Serial.println("Hub started");
-  pinMode(CONFIG_BTN, INPUT_PULLUP);
-  pinMode(ERR_PIN, OUTPUT);
-  pinMode(REF_PIN, OUTPUT);
-  //pinMode(OK_PIN, OUTPUT);
- 
-  attachInterrupt(CONFIG_BTN, highInterrupt, FALLING);
-
-  initSnifferConfig(&hubConfig);
-  if(isConfigMode(&hubConfig)){
-    setupAP(&hubConfig);
+    Serial.println("Start Sniffer");
     
-  }else{
-//    connectWifi(&hubConfig, ERR_PIN);
-
-    //start ok
+    cc1101Serial.begin(9600 );
+    Serial.println("Starting");
+    // put your setup code here, to run once:
+    //initNovaSenor(&mySerial);
     dustSensor.begin(NOVA_RX,NOVA_TX);
+    Serial.println("Ending");
+    pinMode(SENSOR_ERR,OUTPUT);
+    pinMode(LED_SIGNAL,OUTPUT);
+
+   //setup Hudmidity
+    Serial.println("DHT TEST PROGRAM ");
     Serial.print("LIBRARY VERSION: ");
     Serial.println(DHT_LIB_VERSION);
-  }
-  lastCall = millis();  
-  lastReadCall = millis();
+    digitalWrite(LED_SIGNAL, HIGH);
+    digitalWrite(SENSOR_ERR,LOW);
   
 }
 
-void loop(){
-  //Serial.print("Mode: " );
-  //Serial.println(hubConfig.mode);
-  if(needRestart()){
-    ESP.restart();
-  }else{
-    if(isConfigMode(&hubConfig)){
-      handleSmartConfigClient();
-      delay(6000);
-      if ((millis()-lastCall) > 300) {
-        led_status = !led_status;
-        lastCall = millis();
-      }
-      showStatus(led_status);
-    }else{
-      
-      if (((millis()-lastReadCall) > 600000) || restarted || (millis()<lastReadCall)) {
-        restarted = false;
-        lastReadCall = millis();
-        showStatus(true);
-        readSnifferData();
-        if (isValidAirData(envData)) {
-          showStatus(true);
-          if(WiFi.status() != WL_CONNECTED){
-            connectWifi(&hubConfig, ERR_PIN);
-          }
-          
-          if(WiFi.status() == WL_CONNECTED){
-            RestProperty restProperty;
-            restProperty.sender_pro= hubConfig.code;
-            restProperty.latitude_pro= hubConfig.latitude;
-            restProperty.longitude_pro= hubConfig.longitude;
-            restProperty.TEMP_SENSOR_pro= TEMP_SENSOR;
-            restProperty.PM_SENSOR_pro= PM_SENSOR;
-            restProperty.mac_str_pro = hubConfig.macStr;
-            bool ok = saveData(envData,restProperty);
-            Serial.print("Save data:");
-            Serial.println(ok);
-            WiFi.disconnect();
-            if (ok) { 
-              blink_type = 0; //everything ok, no blink
-              showStatus(ok);
-              
-            } else {
-              blink_type = 2;
-            }
-            
-          } else{
-//            showStatus(false);
-            blink_type = 1;
-          }
-          Serial.println();
-        }else{
-//          showStatus(false);
-          blink_type = 3;
-        }
-      }
-      if (blink_type==1) { //Wifi connection error
-        showStatus(true);
-        delay(1000);
-        showStatus(false);
-        delay(1000);
-      } else {
-        flash(blink_type);
-        delay(2000);
-      }
-//      delay(600000);
-    }
-  }
-}
-
-void flash(int numberOfFlash) {
-  for (int i=0; i< numberOfFlash; i++) {
-    showStatus(true);
-    delay(150);
-    showStatus(false);
-    delay(150);
-  }
-}
-
-void highInterrupt(){
-  btnVoltage = analogRead(CONFIG_BTN);
-  refVoltage = analogRead(REF_PIN);
-  if(btnVoltage == refVoltage){
-    WiFi.disconnect();
-    prepareSmartConfig(&hubConfig);
-    delay(5000);
-    ESP.restart();
-  }
-}
-void readSnifferData()
+void loop()
 {
     
-    //delay(5000);
+    delay(5000);
     //read dust sensor value
-    Serial.println("Reading PM Data");
+    Serial.println("Reading Data");
     bool ok = dustSensor.readDustData();
-    Serial.println("Ending read PM Data");
+    Serial.println("Ending read Data");
     //if(ok){
       envData.novaPm25 = dustSensor.getPM25();
       envData.novaPm10 = dustSensor.getPM10();
@@ -175,16 +61,37 @@ void readSnifferData()
      
     //read 
     readTemperatureAndHumidity();
-    int attemp = 0; 
-    while((envData.temperature <= 0 || envData.humidity <= 0) && attemp++<3) { //try 3 time read
+    while(envData.temperature <= 0 || envData.humidity <= 0){
       Serial.println("DHT11 sensor doesn't work properly");
+      digitalWrite(SENSOR_ERR,HIGH);
       readTemperatureAndHumidity();  
       delay(5000);
     }
-    printData(envData);
+    printData();
     delay(1000);
-    Serial.println("Done reading data");
-       
+    cc1101Serial.listen();
+
+    
+    if(isValidData()){
+       digitalWrite(SENSOR_ERR,LOW);
+       Serial.println("Send data to Hub");
+       //blinking the led signal to send to hub
+        for (byte i=0;i<10;++i){
+          digitalWrite(LED_SIGNAL, LOW);
+          delay (100);
+          digitalWrite(LED_SIGNAL, HIGH);
+          delay (100);
+        }
+        sendInfoToHub();
+        //turn on led signal
+        digitalWrite(LED_SIGNAL, HIGH);
+      // delay(5000);
+     //Sleepy::loseSomeTime(6000);
+      
+     
+       sleepSomeTime();
+
+    }
    
 }
 
@@ -220,13 +127,29 @@ void readTemperatureAndHumidity(){
   Serial.println(DHT.temperature, 1);
   
   }
-void showStatus(bool ok){
-  if(ok){
-//    digitalWrite(OK_PIN,HIGH);
-    digitalWrite(ERR_PIN,HIGH);
-  }else{
-//    digitalWrite(OK_PIN,LOW);
-    digitalWrite(ERR_PIN,LOW);
-  }
+
+ //check valid data 
+ bool isValidData(){
+   return (envData.novaPm25>0)&& (envData.novaPm10>0) && (envData.temperature>0) && (envData.humidity>0);
+ }
+
+
+//send data for hub
+void sendInfoToHub(){
+  String theMessage = String(envData.novaPm25)+ "," + String(envData.novaPm10) +"," +String(envData.temperature)+ "," +  String(envData.humidity) ;
+ const char* message = "hello";
+  cc1101Serial.write(theMessage.c_str());
+  delay(5000);
 }
+
+
+ //deep sleep
+ void sleepSomeTime(){
+    
+  for (byte i = 0; i < SLEEP_PERIOD; ++i)
+      Sleepy::loseSomeTime(60000); //maximum is 60 second for this method 
+  
+ }
+
+
 

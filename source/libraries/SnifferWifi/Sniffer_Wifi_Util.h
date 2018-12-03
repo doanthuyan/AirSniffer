@@ -6,7 +6,7 @@
 #define RETRY_LIM 50
 
 
-void connectWifi(HubConfig* smartConfig, int ERR_PIN);
+void connectWifi(HubConfig* smartConfig);
 
 
 #endif
