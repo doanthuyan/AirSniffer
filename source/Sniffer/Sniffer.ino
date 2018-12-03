@@ -55,7 +55,6 @@ void setup(){
 //    connectWifi(&hubConfig, ERR_PIN);
 
     //start ok
-    
     dustSensor.begin(NOVA_RX,NOVA_TX);
     Serial.print("LIBRARY VERSION: ");
     Serial.println(DHT_LIB_VERSION);
@@ -73,7 +72,7 @@ void loop(){
   }else{
     if(isConfigMode(&hubConfig)){
       handleSmartConfigClient();
-//      delay(6000);
+      delay(6000);
       if ((millis()-lastCall) > 300) {
         led_status = !led_status;
         lastCall = millis();
@@ -89,7 +88,7 @@ void loop(){
         if (isValidAirData(envData)) {
           showStatus(true);
           if(WiFi.status() != WL_CONNECTED){
-            connectWifi(&hubConfig);
+            connectWifi(&hubConfig, ERR_PIN);
           }
           
           if(WiFi.status() == WL_CONNECTED){
@@ -101,9 +100,13 @@ void loop(){
             restProperty.PM_SENSOR_pro= PM_SENSOR;
             restProperty.mac_str_pro = hubConfig.macStr;
             bool ok = saveData(envData,restProperty);
+            Serial.print("Save data:");
+            Serial.println(ok);
+            WiFi.disconnect();
             if (ok) { 
               blink_type = 0; //everything ok, no blink
               showStatus(ok);
+              
             } else {
               blink_type = 2;
             }
@@ -145,8 +148,9 @@ void highInterrupt(){
   btnVoltage = analogRead(CONFIG_BTN);
   refVoltage = analogRead(REF_PIN);
   if(btnVoltage == refVoltage){
-  
+    WiFi.disconnect();
     prepareSmartConfig(&hubConfig);
+    delay(5000);
     ESP.restart();
   }
 }
