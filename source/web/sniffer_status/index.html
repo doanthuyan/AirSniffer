@@ -1,0 +1,50 @@
+<script type="text/javascript" language="javascript">
+
+function send()
+{
+    var urlvariable;
+
+    urlvariable = "text";
+
+	var d = new Date();
+	var dStr = d.toISOString().slice(0,10);
+
+    
+	console.log(document.getElementById("scode").value);
+	urlvariable ='{"criteria": [{"field":"sourceId","expression": "equal","value":"'
+		+ document.getElementById("scode").value
+		+ '"},{"field":"measuredAt","expression": "gt","value":"'
+		+d.toISOString().slice(0,10)
+		+ 'T00:00:00.000Z"}]}';
+	var params = encodeURIComponent(urlvariable);
+    URL = "https://airsniffer.org/api/pollutantvalues?searchBy=" +params;
+	console.log(urlvariable);
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = callbackFunction(xmlhttp);
+    xmlhttp.open("GET", URL, false);
+    xmlhttp.setRequestHeader("Content-Type", "application/json");
+    xmlhttp.setRequestHeader('Authorization', 'Basic c25pZmZlcm1pbmQ6IUF0b21BQVZOMjAxNw=='); //in prod, you should encrypt user name and password and provide encrypted keys here instead 
+    xmlhttp.onreadystatechange = callbackFunction(xmlhttp);
+    xmlhttp.send();
+    //alert(xmlhttp.responseText);
+    document.getElementById("div").innerHTML = xmlhttp.responseText ;
+}
+
+function callbackFunction(xmlhttp) 
+{
+    //alert(xmlhttp.responseXML);
+}
+</script>
+
+
+<html>
+<body id='bod'>
+<h2>Server https://airsniffer.org </h2>
+ Sniffer code: <input type="text" name="scode" id='scode' required><br>
+ 
+<button type="submit" onclick="javascript:send()">Get data</button><br><br>
+<h3>Sniffer data today</h3>
+<textarea id='div'rows="30" cols="100" placeholder="Sniffer data today..." readonly>
+
+</textarea></body>
+</html>
