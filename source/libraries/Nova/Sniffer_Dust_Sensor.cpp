@@ -29,27 +29,18 @@ void SnifferDustSensor::begin(uint8_t pin_rx, uint8_t pin_tx) {
 
  
 bool SnifferDustSensor::readDustData(){
-	envData.novaPm10 = 0;
-	envData.novaPm25 = 0;
 	bool ok = true;
 	//for ESP
     //novaSerial->listen();
     sensor->set_sleep(false);
-//     delay(5000);
+    delay(5000);
     //read dust sensor value
-    unsigned long int lastAttempt = millis();
-    int attemp = 0;
     ok = calcNovaPM();
-    //If data error or we've tried already 20 times, stop
-    while((envData.novaPm25 <= 0 || envData.novaPm10 <= 0 || envData.novaPm25 >= 300 || envData.novaPm10 >=1000) && attemp++<20) {
-      if ((lastAttempt-millis())>5000) {
-      lastAttempt = millis();
-      	Serial.println("Nova sensor doesn't work properly");
-      	ok = calcNovaPM();
-      }
-//       delay(3000);
+    while(envData.novaPm25 <= 0 || envData.novaPm10 <= 0){
+      Serial.println("Nova sensor doesn't work properly");
+      ok = calcNovaPM();
+      delay(5000);
     }
-    Serial.println("Stop NOVA");
     sensor->set_sleep(true);
 	
 	return ok;
@@ -62,8 +53,8 @@ bool SnifferDustSensor::calcNovaPM(){
     int pm25, pm10;
     bool ok = true;
 
-//     sensor->set_sleep(false);
-//     delay(1000);
+    sensor->set_sleep(false);
+    delay(1000);
     ok = sensor->query_data_auto(&pm25, &pm10, SAMPLES);
     envData.novaPm25 = pm25/10.0;
     envData.novaPm10 = pm10/10.0;
@@ -72,8 +63,7 @@ bool SnifferDustSensor::calcNovaPM(){
    // }else{
    //   digitalWrite(SENSOR_ERR,HIGH);
     //}
-//     Serial.println("Stop NOVA");
-// 	sensor->set_sleep(true);
+	sensor->set_sleep(true);
 	return ok;
 }
 

@@ -17,8 +17,8 @@ extern dht DHT;
 
 #define DHT11_PIN D1 //GPO05 
 #define CONFIG_BTN D4 //GPO02
-#define ERR_PIN D2  //GPO14
-//#define OK_PIN D2  //GPO04
+#define ERR_PIN D5  //GPO14
+#define OK_PIN D2  //GPO04
 #define NOVA_RX D7  //GPO13
 #define NOVA_TX D6  //GPO12
 #define REF_PIN D0  //GPO16
