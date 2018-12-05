@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/src/Internals
+END
+Comments.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/src/Internals/Comments.cpp
+END
+StaticStringBuilder.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/src/Internals/StaticStringBuilder.cpp
+END
+Encoding.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/src/Internals/Encoding.cpp
+END
+JsonParser.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/src/Internals/JsonParser.cpp
+END
+IndentedPrint.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/src/Internals/IndentedPrint.cpp
+END
+List.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/src/Internals/List.cpp
+END
+Prettyfier.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/src/Internals/Prettyfier.cpp
+END
