@@ -373,14 +373,17 @@ void storeConfig(HubConfig* smartConfig){
   
   String qsid = "",qpass="", qcode ="",qlatitude="", qlongitude="", qmac="";
   
-  
-   for (int i = 0; i < sizeof(smartConfig); ++i) { 
-  	EEPROM.write(i, '\0'); 
+  int size;
+   for (size = 0; size < sizeof(smartConfig); ++size) { 
+  	EEPROM.write(size, '\0'); 
   	Serial.print(".");
   }
   
   EEPROM.commit();
-  //delay(100);
+  delay(100);
+  Serial.print("Clear EEPROM size: ");
+  Serial.println(size);
+  
   EEPROM.write(0, smartConfig->mode);
   int usedByteCount = sizeof(smartConfig->mode);
   qsid.concat(smartConfig->ssid);
@@ -467,17 +470,20 @@ void storeConfig(HubConfig* smartConfig){
 void clearStoredWifi(){
 	HubConfig * dummy;
   Serial.println("\nclearing wifi config only");
-        for (int i = 0; i < sizeof(dummy->mode)+sizeof(dummy->ssid)+sizeof(dummy->pwd); ++i) { 
+  int i;
+        for ( i = 0; i < sizeof(dummy->mode)+sizeof(dummy->ssid)+sizeof(dummy->pwd); ++i) { 
         	Serial.print(".");
 			EEPROM.write(i, 0); 
 		}
-	Serial.println("");
+	
   EEPROM.commit();
-  //delay(100);
+  delay(100);
+  Serial.print("Clear Wifi size: ");
+  Serial.println(i);
 }
 void clearStoredConfig(){
 	HubConfig * dummy;
-  Serial.println("\nclearing wifi config only");
+  Serial.println("\nclearing all config data");
         for (int i = 0; i < sizeof(HubConfig); ++i) { 
 			EEPROM.write(i, 0); 
 		}
