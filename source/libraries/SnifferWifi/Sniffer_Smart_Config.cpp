@@ -483,7 +483,7 @@ void clearStoredWifi(){
 }
 void clearStoredConfig(){
 	HubConfig * dummy;
-  Serial.println("\nclearing wifi config only");
+  Serial.println("\nclearing all config data");
         for (int i = 0; i < sizeof(HubConfig); ++i) { 
 			EEPROM.write(i, 0); 
 		}
