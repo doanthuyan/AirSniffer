@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/src
+END
+JsonVariant.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/src/JsonVariant.cpp
+END
+ArduinoJson.h
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/src/ArduinoJson.h
+END
+JsonObject.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/src/JsonObject.cpp
+END
+JsonBuffer.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/src/JsonBuffer.cpp
+END
+JsonArray.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/src/JsonArray.cpp
+END
+CMakeLists.txt
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/src/CMakeLists.txt
+END

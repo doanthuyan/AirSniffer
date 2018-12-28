@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/scripts
+END
+build-arduino-package.sh
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/scripts/build-arduino-package.sh
+END
+cpplint.sh
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/scripts/cpplint.sh
+END
+create-build-envs.sh
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/scripts/create-build-envs.sh
+END
+create-size-graph.sh
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/scripts/create-size-graph.sh
+END
+format-code.sh
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/scripts/format-code.sh
+END
+build-old-arduino-package.sh
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/scripts/build-old-arduino-package.sh
+END
+run-tests.sh
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/Iot/!svn/ver/207/latest-gas-scale/trunk/arduino/library/ArduinoJson-master/scripts/run-tests.sh
+END

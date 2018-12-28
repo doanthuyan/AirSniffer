@@ -13,6 +13,7 @@ bool saveData(Environment envirData, RestProperty restProperty)
   Serial.println("\nAttempt to make a connection to the remote server");
   if ( !client.connect(serverAddress, httpsPort) ) {
     Serial.println("connection failed");
+	return false;
   }
   Serial.println("\n\n---------------------------------------------------------------------\n");
   Serial.println("REQUEST: \n" );

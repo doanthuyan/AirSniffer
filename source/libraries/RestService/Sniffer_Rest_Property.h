@@ -2,7 +2,7 @@
 #define _REST_PROPERTY_H
 #include <SPI.h>
 
-#define serverAddress "airsniffer.org"
+#define serverAddress "crowdsniffing.org"
 #define url "/api/pollutantvalues"
 
 #define httpsPort 443

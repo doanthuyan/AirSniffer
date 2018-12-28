@@ -1,7 +1,7 @@
 #include "Sniffer_Dust_Sensor.h"
 #include <SoftwareSerial.h>
-#define NOVA_RX 8
-#define NOVA_TX 7
+#define NOVA_RX D7
+#define NOVA_TX D6
 
 //#include <SPI.h>
 SnifferDustSensor dustSensor;
