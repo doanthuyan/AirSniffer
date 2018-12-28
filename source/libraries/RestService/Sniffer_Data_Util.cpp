@@ -65,7 +65,7 @@ void formatAAVNData(char * dataStr, Environment envirData,RestProperty restPrope
       obj3[SENSOR_KEY] = restProperty.PM_SENSOR_pro;
       JsonObject& val3 = obj3.createNestedObject(VAL_KEY);
       val3[VAL_KEY] = envirData.novaPm25;
-      
+	  data.add(obj3);
   }else{
     Serial.println("/*******************************/");
     Serial.print("ERROR reading PM2.5: ");
@@ -81,6 +81,7 @@ void formatAAVNData(char * dataStr, Environment envirData,RestProperty restPrope
     obj4[SENSOR_KEY] = restProperty.PM_SENSOR_pro;
     JsonObject& val4 = obj4.createNestedObject(VAL_KEY);
     val4[VAL_KEY] = envirData.novaPm10;
+	data.add(obj4);
     
   }else{
     Serial.println("/*******************************/");
@@ -95,12 +96,7 @@ void formatAAVNData(char * dataStr, Environment envirData,RestProperty restPrope
   obj2.prettyPrintTo(Serial);
   */
   
-  
-  
-  data.add(obj3);
-  data.add(obj4);
-
-  Serial.println();
+  Serial.println("");
   root.prettyPrintTo(Serial);
   root.printTo(dataStr,600);
 
