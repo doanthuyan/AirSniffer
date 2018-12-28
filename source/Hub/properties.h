@@ -20,7 +20,7 @@ const long interval = 20000;
 
 //#define serverAddress "api.thingspeak.com"
 //#define writeAPIKey  "7X8TBTEOMUESVGPQ"
-#define serverAddress "airsniffer.org"
+#define serverAddress "crowdsniffing.org"
 #define url "/api/pollutantvalues"
 #define sender "1A4hRM7ti7"
 #define macStr "FF-A2-DA-00-3F-00"
