@@ -15,8 +15,8 @@ Environment envData;
 #define PM_SENSOR "Nova fitness"
 
 
-const char* ssid     = "IoT";
-const char* password = "IoT@@@VN1@3";
+const char* ssid     = "your_wifi";
+const char* password = "your_password";
 
 void setup() {
   //setup wifi
