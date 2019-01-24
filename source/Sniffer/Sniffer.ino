@@ -195,22 +195,27 @@ void readTemperatureAndHumidity(){
   // READ DATA
   Serial.print("DHT11, \t");
   int chk = DHT.read11(DHT11_PIN);
-  switch (chk)
-  {
-    case DHTLIB_OK:  
-    Serial.print("OK,\t"); 
-    break;
-    case DHTLIB_ERROR_CHECKSUM: 
-    Serial.print("Checksum error,\t"); 
-    break;
-    case DHTLIB_ERROR_TIMEOUT: 
-    Serial.print("Time out error,\t"); 
-    break;
-    default: 
-    Serial.print("Unknown error,\t"); 
-    break;
+  bool readSucess = false;
+  for (int i = 0; i < 5 && !readSucess; i++){
+    switch (chk)
+    {
+      case DHTLIB_OK:  
+      readSucess = true;
+      Serial.print("OK,\t"); 
+      break;
+      case DHTLIB_ERROR_CHECKSUM: 
+      Serial.print("Checksum error,\t"); 
+      
+      break;
+      case DHTLIB_ERROR_TIMEOUT: 
+      Serial.print("Time out error,\t"); 
+      break;
+      default: 
+      Serial.print("Unknown error,\t"); 
+      break;
+    }
+    delay (100);
   }
-
 
   envData.temperature = DHT.temperature;
   envData.humidity = DHT.humidity;
@@ -229,4 +234,3 @@ void showStatus(bool ok){
     digitalWrite(ERR_PIN,LOW);
   }
 }
-

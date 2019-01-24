@@ -105,7 +105,7 @@ void formatAAVNData(char * dataStr, Environment envirData,RestProperty restPrope
 
  //check valid data 
  bool isValidAirData(Environment envirData){
-   return (envirData.novaPm25>0)&& (envirData.novaPm10>0) && (envirData.temperature>0) && (envirData.humidity>0);
+   return (envirData.novaPm25>0)|| (envirData.novaPm10>0) || (envirData.temperature>0) || (envirData.humidity>0);
  }
 
 void printData(Environment envirData){

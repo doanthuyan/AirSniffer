@@ -15,7 +15,7 @@
 //extern bool wifiStatus;
 extern dht DHT;
 
-#define DHT11_PIN D1 //GPO05 
+#define DHT11_PIN D3 //GPO05 
 #define CONFIG_BTN D4 //GPO02
 #define ERR_PIN D2  //GPO14
 //#define OK_PIN D2  //GPO04
