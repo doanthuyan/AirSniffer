@@ -1,6 +1,7 @@
 #include "displayer.h"
 #include "properties.h"
-#include "constants.h"
+
+#include <Sniffer_Smart_Config.h>
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #define printByte(args)  write(args);
@@ -17,6 +18,12 @@ B00000,
 B00000,
 B00000
 };
+
+const char degree = char (223);
+const char micro = char (241);
+#define CUBIC_INDEX 0
+
+
 void initLcd(){
   lcd.init();                      // initialize the lcd 
   // Print a message to the LCD.
@@ -105,4 +112,3 @@ void showSmartConfig(){
   delay(2000);
 
 }
-
