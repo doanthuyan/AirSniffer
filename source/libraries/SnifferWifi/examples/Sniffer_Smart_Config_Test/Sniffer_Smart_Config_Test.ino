@@ -43,7 +43,7 @@ void setup() {
     setupAP(&hubConfig);
     
   }else{
-    connectWifi(&hubConfig,WIFI_ERR_PIN);
+    connectWifi(&hubConfig);
   }
 }
 

@@ -55,7 +55,7 @@ void setup(){
 //    connectWifi(&hubConfig, ERR_PIN);
 
     //start ok
-    dustSensor.begin(NOVA_RX,NOVA_TX);
+    dustSensor.begin(&Serial2);
     Serial.print("LIBRARY VERSION: ");
     Serial.println(DHT_LIB_VERSION);
   }

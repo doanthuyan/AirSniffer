@@ -1,17 +1,17 @@
 #include "Sniffer_Smart_Config.h"
 #include <EEPROM.h>
-#include <ESP8266WebServer.h>
+#include <WebServer.h>
 #include <WiFiClientSecure.h>
 //Sniffer state
-#define CONFIG_MODE 1
-#define NORM_MODE 0
+uint8_t CONFIG_MODE = 1;
+uint8_t NORM_MODE = 0;
 #define ONBOARDED -1
 
 //private data
 String configPage;
 String jsonConfig;
 String macAddressJson;
-ESP8266WebServer server(httpPort);
+WebServer server(httpPort);
 int snifferState;
 HubConfig * _oldConfig;
 bool wifiConnected = false;
@@ -63,7 +63,7 @@ void setupAP(HubConfig* oldConfig) {
       Serial.print(" (");
       Serial.print(WiFi.RSSI(i));
       Serial.print(")");
-      Serial.println((WiFi.encryptionType(i) == ENC_TYPE_NONE)?" ":"*");
+      //Serial.println((WiFi.encryptionType(i) == ENC_TYPE_NONE)?" ":"*");
       delay(10);
       //configPage.concat("<li><a href=\"/inputPwd/"+WiFi.SSID(i)+"\">"+WiFi.SSID(i)+"</a></li>");
       configPage.concat("<li><form method=\"post\" action=\"/inputPwd\" class=\"inline\">");
@@ -492,7 +492,8 @@ void clearStoredConfig(){
   //delay(100);
 }
 bool isConfigMode(HubConfig* smartConfig){
-	return smartConfig->mode == CONFIG_MODE;
+	//return smartConfig->mode == CONFIG_MODE;
+	return smartConfig->mode > 0;
 }
 void handleSmartConfigClient(){
 	server.handleClient();
@@ -525,7 +526,7 @@ void prepareSmartConfig(HubConfig* smartConfig){
     
 }
 void printConfig(HubConfig* smartConfig){
-	Serial.print("MODE: "); Serial.println(smartConfig->mode);
+	Serial.print("MODE: "); Serial.println(uint8_t(smartConfig->mode));
 	Serial.print("SSID: "); Serial.println(smartConfig->ssid);
 	Serial.print("PWD: "); Serial.println(smartConfig->pwd);
 	Serial.print("CODE: "); Serial.println(smartConfig->code);

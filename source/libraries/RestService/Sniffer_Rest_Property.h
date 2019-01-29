@@ -1,6 +1,7 @@
 #ifndef _REST_PROPERTY_H
 #define _REST_PROPERTY_H
 #include <SPI.h>
+#include <Arduino.h>
 
 #define serverAddress "crowdsniffing.org"
 #define url "/api/pollutantvalues"

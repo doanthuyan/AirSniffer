@@ -1,6 +1,7 @@
 #ifndef _SNIFFER_DUST_H
 #define _SNIFFER_DUST_H
 
+#include <HardwareSerial.h>
 #include <SoftwareSerial.h>
 #include "Sds011.h"
 
@@ -15,6 +16,8 @@ class SnifferDustSensor
 	public:
 		SnifferDustSensor(void);
 		void begin(uint8_t pin_rx, uint8_t pin_tx);
+		void begin(HardwareSerial *hardSerial);
+		
 		bool readDustData();
 		
 		
@@ -27,7 +30,8 @@ class SnifferDustSensor
 	
 		uint8_t _pin_rx, _pin_tx;
 		Sds011 *sensor;	
-		SoftwareSerial *novaSerial;
+		HardwareSerial *novaSerial;
+		SoftwareSerial *softSerial;
 		Dust envData;		
 
 };

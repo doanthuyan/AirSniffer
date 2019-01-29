@@ -11,7 +11,14 @@
 
 SnifferDustSensor::SnifferDustSensor(void) {
 }
-
+void SnifferDustSensor::begin(HardwareSerial *hardSerial){
+	
+	hardSerial->begin(9600);
+	novaSerial = hardSerial;
+	sensor = new Sds011(*novaSerial);
+	sensor->set_sleep(false);
+    sensor->set_mode(sds011::QUERY);
+}
  
 void SnifferDustSensor::begin(uint8_t pin_rx, uint8_t pin_tx) {
 
@@ -21,7 +28,7 @@ void SnifferDustSensor::begin(uint8_t pin_rx, uint8_t pin_tx) {
 	SoftwareSerial *softSerial = new SoftwareSerial(_pin_rx, _pin_tx);
 	softSerial->begin(9600);
 
-	novaSerial = softSerial;
+	//novaSerial = softSerial;
 	sensor = new Sds011(*novaSerial);
 	sensor->set_sleep(false);
     sensor->set_mode(sds011::QUERY);
@@ -58,7 +65,7 @@ bool SnifferDustSensor::readDustData(){
   
 //read PM2.5, PM 10 from Nova sensor
 bool SnifferDustSensor::calcNovaPM(){
-  //Serial.println("calcNovaPM()");
+  Serial.println("calcNovaPM()");
     int pm25, pm10;
     bool ok = true;
 

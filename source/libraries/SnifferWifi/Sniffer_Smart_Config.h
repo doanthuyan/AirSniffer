@@ -1,6 +1,6 @@
 #ifndef _SMARTCONFIG_H
 #define _SMARTCONFIG_H
-#include <ESP8266WiFi.h>
+#include <WiFi.h>
 
 #define smartConfigSSID "SNIFFER"
 #define httpPort 80

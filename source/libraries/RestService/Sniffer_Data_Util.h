@@ -1,6 +1,7 @@
 #ifndef _DATAUTIL_H
 #define _DATAUTIL_H
-#include <ESP8266WiFi.h>
+//#include <ESP8266WiFi.h>
+#include <WiFi.h>
 #include <Sniffer_Rest_Property.h>
 
 struct Environment{
