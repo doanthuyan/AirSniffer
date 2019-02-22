@@ -1,28 +1,41 @@
-language: c
+language: cpp
+
 env:
-  - BD=esp8266:esp8266:nodemcuv2:CpuFrequency=80,FlashSize=4M3M
+  global:
+    - ARDUINO_VERSION="1.8.5"
+  matrix:
+    - BOARD="esp8266:esp8266:generic" FLAGS=':CpuFrequency=80,ResetMethod=ck,CrystalFreq=26,FlashFreq=40,FlashMode=qio,FlashSize=512K0'
+    - BOARD="esp32:esp32:esp32"       FLAGS=''
+
 before_install:
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16"
   - sleep 3
   - export DISPLAY=:1.0
-  - wget http://downloads.arduino.cc/arduino-1.8.2-linux64.tar.xz
-  - tar xf arduino-1.8.2-linux64.tar.xz
-  - sudo mv arduino-1.8.2 /usr/local/share/arduino
+  - wget http://downloads.arduino.cc/arduino-$(eval echo $ARDUINO_VERSION)-linux64.tar.xz
+  - tar xf arduino-$(eval echo $ARDUINO_VERSION)-linux64.tar.xz
+  - sudo mv arduino-$(eval echo $ARDUINO_VERSION) /usr/local/share/arduino
   - sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino
+  - mkdir build
+
 install:
-  - ln -s $PWD /usr/local/share/arduino/libraries/
-  - arduino --pref "boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json" --save-prefs
-  - arduino --install-boards esp8266:esp8266
-  - arduino --board $BD --save-prefs
-  - arduino --pref "compiler.warning_level=all" --save-prefs
-  
-  # install lib
-  # add your libs here, example:
-  #- git clone https://github.com/squix78/esp8266-oled-ssd1306 /usr/local/share/arduino/libraries/esp8266-oled-ssd1306
-  
+  - if [[ "$BOARD" =~ "esp8266:esp8266:" ]]; then
+      arduino --pref "boardsmanager.additional.urls=http://arduino.esp8266.com/stable/package_esp8266com_index.json" --save-prefs;
+      arduino --install-boards esp8266:esp8266 > /dev/null;
+      arduino --board esp8266:esp8266:generic --save-prefs;
+    fi
+  - if [[ "$BOARD" =~ "esp32:esp32:" ]]; then
+      arduino --pref "boardsmanager.additional.urls=https://dl.espressif.com/dl/package_esp32_index.json" --save-prefs;
+      arduino --install-boards esp32:esp32 > /dev/null;
+      arduino --board esp32:esp32:esp32 --save-prefs;
+    fi
+  - ln -s $PWD /usr/local/share/arduino/libraries/Koyn
+
+before_script:
+  - arduino --pref build.path=$PWD/build --board $BOARD$FLAGS --save-prefs
+
 script:
-#compile the code, example:
- - arduino --verify --board $BD $PWD/path_to_the_file/file.ino
+ - for example in $PWD/source/Sniffer/Sniffer.ino; do arduino --verify $example; done;
+#  - find $PWD/source/Sniffer -type f -name "*.ino" -exec arduino --verify {} \;
 
 notifications:
   email:
