@@ -42,7 +42,7 @@ install:
 #  - arduino --install-library "AzureIoTUtility"
 #  - arduino --install-library "AzureIoTHub"
 #  - arduino --install-library "AzureIoTProtocol_MQTT"
-  - arduino --install-library "ArduinoJson"
+#  - arduino --install-library "ArduinoJson"
 #  - arduino --install-library "DHT sensor library"
 #  - arduino --install-library "Adafruit Unified Sensor"
   # a slash bug in the arduino IoT lib
