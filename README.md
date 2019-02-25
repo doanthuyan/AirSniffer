@@ -1,4 +1,5 @@
 # AirSniffer
+ [![Linux build status](https://travis-ci.org/esp8266/Arduino.svg)](https://travis-ci.org/doanthuyan/AirSniffer)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/aavn/AirSniffer/blob/master/LICENSE)
 
 This is the source code and libaries for project Sniffer from AxonActive Vietnam.
