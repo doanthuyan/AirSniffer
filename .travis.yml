@@ -34,11 +34,7 @@ before_install:
   - buildExampleSketch() {
       EXAMPLE_SKETCH=$PWD/source/$1/$1.ino;
 
-#      if [[ "$BOARD" =~ "esp8266:esp8266:" ]]; then
-#        findAndReplace WiFi101 ESP8266WiFi $EXAMPLE_SKETCH;
-#        findAndReplace WiFiSSLClient WiFiClientSecure $EXAMPLE_SKETCH;
-#        findAndReplace WiFiUdp WiFiUdp $EXAMPLE_SKETCH; 
-#      fi
+
       
       arduino --verbose-build --verify --board $BOARD $EXAMPLE_SKETCH;
     }
