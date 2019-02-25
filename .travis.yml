@@ -9,7 +9,7 @@ env:
   global:
     - IDE_VERSION=1.8.1
   matrix:
-    - BOARD="esp8266:esp8266:thingdev"
+    - BOARD="esp8266:esp8266:nodemcuv2"
 before_install:
   - /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16
   - sleep 3
@@ -43,7 +43,7 @@ install:
 #  - arduino --install-library "AzureIoTHub"
 #  - arduino --install-library "AzureIoTProtocol_MQTT"
   - arduino --install-library "ArduinoJson"
-  - arduino --install-library "DHT sensor library"
+#  - arduino --install-library "DHT sensor library"
 #  - arduino --install-library "Adafruit Unified Sensor"
   # a slash bug in the arduino IoT lib
 #  - sed -i -e 's/azure_c_shared_utility\\crt_abstractions.h/azure_c_shared_utility\/crt_abstractions.h/g' /home/travis/Arduino/libraries/AzureIoTHub/src/esp8266/azcpgmspace.h
