@@ -9,7 +9,7 @@ env:
   global:
     - IDE_VERSION=1.8.1
   matrix:
-    - BOARD="esp8266:esp8266:nodemcuv2:CpuFrequency=80,VTable=flash,FlashSize=4M1M,LwIPVariant=v2mss536,Debug=Disabled,DebugLevel=None____,FlashErase=none,UploadSpeed=115200"
+    - BOARD="esp8266:esp8266:nodemcuv2:xtal=80,eesz=4M3Mone,UploadSpeed=115200"
 before_install:
   - /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16
   - sleep 3
