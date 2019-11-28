@@ -53,7 +53,8 @@ jobs:
       # dynamically by the build matrix.
       - name: Install platform
         run: |
-          arduino-cli core update-index
+          #arduino-cli core update-index --additional-urls https://dl.espressif.com/dl/package_esp32_index.json
+          arduino-cli core search esp8266 --additional-urls https://dl.espressif.com/dl/package_esp32_index.json
           arduino-cli core install ${{ matrix.arduino-platform }}
 
       # Finally, we compile the sketch, using the FQBN that was set
