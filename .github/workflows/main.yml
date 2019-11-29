@@ -67,8 +67,7 @@ jobs:
           dir "d:/a/AirSniffer/AirSniffer"
       - name: Copy library files
         run: |
-         
-          robocopy "d:/a/AirSniffer/AirSniffer/source/libraries/Nova" "d:/a/AirSniffer/AirSniffer/backup" 
+          robocopy "d:/a/AirSniffer/AirSniffer/source/libraries/Nova" "d:/a/AirSniffer/AirSniffer/backup" /E
           dir "d:/a/AirSniffer/AirSniffer/backup"
       # Finally, we compile the sketch, using the FQBN that was set
       # in the build matrix.
