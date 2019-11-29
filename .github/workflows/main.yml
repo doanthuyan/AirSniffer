@@ -64,7 +64,7 @@ jobs:
       - name: Create libraries folder
         run: mkdir "C:\Users\runneradmin\Documents\Arduino\libraries"
       - name: Copy library files
-        run:  Xcopy "/E" "/I" "./source/libraries" "C:\Users\runneradmin\Documents\Arduino\libraries"
+        run:  Xcopy /E/I "./source/libraries" "C:\Users\runneradmin\Documents\Arduino\libraries"
       # Finally, we compile the sketch, using the FQBN that was set
       # in the build matrix.
       - name: Compile Sketch
