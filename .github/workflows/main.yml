@@ -51,16 +51,18 @@ jobs:
 
       # We then install the platform, which one will be determined
       # dynamically by the build matrix.
-      - name: Install platform
+      - name: Install ESP8266 boards
         run: |
           arduino-cli core update-index --additional-urls http://arduino.esp8266.com/stable/package_esp8266com_index.json
           arduino-cli core search esp8266 --additional-urls http://arduino.esp8266.com/stable/package_esp8266com_index.json
           arduino-cli core install  esp8266:esp8266 --additional-urls http://arduino.esp8266.com/stable/package_esp8266com_index.json
           arduino-cli core list
           arduino-cli config dump
-          mkdir "C:\Users\runneradmin\Documents\Arduino\libraries"
-          Xcopy /E /I "./source/libraries" "C:\Users\runneradmin\Documents\Arduino\libraries"
-
+          
+      - name: Create libraries folder
+        run: mkdir "C:\Users\runneradmin\Documents\Arduino\libraries"
+      - name: Copy library files
+        run:  Xcopy /E /I "./source/libraries" "C:\Users\runneradmin\Documents\Arduino\libraries"
       # Finally, we compile the sketch, using the FQBN that was set
       # in the build matrix.
       - name: Compile Sketch
