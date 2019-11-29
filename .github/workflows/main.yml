@@ -62,9 +62,9 @@ jobs:
       #    arduino-cli config dump
           
       - name: Create libraries folder
-        run: mkdir "C:\Users\runneradmin\Documents\Arduino\libraries"
+        run: mkdir "d:/a/AirSniffer/AirSniffer/backup"
       - name: Copy library files
-        run:  Xcopy /E/I "./source/libraries" "C:\Users\runneradmin\Documents\Arduino\libraries"
+        run:  Xcopy /E/I "./source/libraries" "d:/a/AirSniffer/AirSniffer/backup"
       # Finally, we compile the sketch, using the FQBN that was set
       # in the build matrix.
       - name: Compile Sketch
